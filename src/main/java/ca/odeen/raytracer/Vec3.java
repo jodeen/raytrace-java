@@ -57,8 +57,8 @@ public class Vec3 {
         return (float) Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
     }
 
-    public static Vec3 unitVector(Vec3 v) {
-        return v.div(v.length());
+    public Vec3 unitVector() {
+        return this.div(this.length());
     }
     
     public float dot(Vec3 v1) {
