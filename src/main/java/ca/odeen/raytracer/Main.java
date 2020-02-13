@@ -9,28 +9,15 @@ import java.io.FileWriter;
  */
 public class Main {
 
-    public static float hitSphere(Vec3 center, float radius, Ray r) {
-        Vec3 oc = r.origin().sub(center);
-        float a = r.direction().dot(r.direction());
-        float b = 2f * oc.dot(r.direction());
-        float c = oc.dot(oc) - radius * radius;
-        float discriminant = b * b - 4 * a * c;
-        if (discriminant < 0) {
-            return -1f;
+    public static Vec3 color(Ray r, Hittable world) {
+        HitRecord rec = world.hit(r, 0f, Float.MAX_VALUE);
+        if (rec != null) {
+            return new Vec3(rec.normal().x() + 1f, rec.normal().y() + 1f, rec.normal().z() + 1f).mult(0.5f);
         } else {
-            return (-b - (float) Math.sqrt(discriminant)) / (2f * a);
+            Vec3 unitDirection = r.direction().unitVector();
+            float t = 0.5f * (unitDirection.y() + 1f);
+            return new Vec3(1f, 1f, 1f).mult(1f - t).add(new Vec3(0.5f, 0.7f, 1f).mult(t));
         }
-    }
-
-    public static Vec3 color(Ray r) {
-        float t = hitSphere(new Vec3(0f, 0f, -1f), 0.5f, r);
-        if (t > 0f) {
-            Vec3 n = r.pointAtParameter(t).sub(new Vec3(0f,0f,-1f)).unitVector();
-            return (new Vec3(n.x() + 1, n.y() + 1, n.z() + 1)).mult(0.5f);
-        }
-        Vec3 unitDirection = r.direction().unitVector();
-        t = 0.5f * (unitDirection.y() + 1.0f);
-        return new Vec3(1f, 1f, 1f).mult(1f - t).add(new Vec3(0.5f, 0.7f, 1f).mult(t));
     }
 
     public static void main(String[] args) throws Exception {
@@ -43,6 +30,10 @@ public class Main {
             Vec3 horizontal = new Vec3(4f, 0f, 0f);
             Vec3 vertical = new Vec3(0f, 2f, 0f);
             Vec3 origin = new Vec3(0f, 0f, 0f);
+            Hittable world = new HittableList(
+                    new Sphere(new Vec3(0f, 0f, -1f), 0.5f),
+                    new Sphere(new Vec3(0f, -100.5f, -1f), 100f));
+//            world = new Sphere(new Vec3(0f, 0f, -1f), 0.5f);
 
             for (int j = ny - 1; j >= 0; j--) {
                 for (int i = 0; i < nx; i++) {
@@ -53,7 +44,9 @@ public class Main {
                     Ray r = new Ray(origin,
                             lowerLeftCorner.add(horizontal.mult(u)).add(vertical.mult(v)));
 
-                    Vec3 col = color(r);
+                    Vec3 p = r.pointAtParameter(2f);
+
+                    Vec3 col = color(r, world);
 
                     int ir = (int) (255.99 * col.a());
                     int ig = (int) (255.99 * col.b());
