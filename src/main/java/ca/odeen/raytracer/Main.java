@@ -10,10 +10,21 @@ import java.util.Random;
  */
 public class Main {
 
+        private static Random rand = new Random();
+        
+    public static Vec3 randomInUnitSphere() {
+        Vec3 p;
+        do {
+            p = new Vec3(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()).mult(2f).sub(new Vec3(1f,1f,1f));
+        } while (p.squaredLength() >= 1f);
+        return p;
+    }
+    
     public static Vec3 color(Ray r, Hittable world) {
-        HitRecord rec = world.hit(r, 0f, Float.MAX_VALUE);
+        HitRecord rec = world.hit(r, 0.001f, Float.MAX_VALUE);
         if (rec != null) {
-            return new Vec3(rec.normal().x() + 1f, rec.normal().y() + 1f, rec.normal().z() + 1f).mult(0.5f);
+            Vec3 target = rec.p().add(rec.normal()).add(randomInUnitSphere());
+            return color(new Ray(rec.p(), target.sub(rec.p())), world).mult(0.5f);
         } else {
             Vec3 unitDirection = r.direction().unitVector();
             float t = 0.5f * (unitDirection.y() + 1f);
@@ -22,7 +33,6 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        Random rand = new Random();
         int nx = 200;
         int ny = 100;
         int ns = 100;
@@ -46,6 +56,7 @@ public class Main {
                         col = col.add(color(r, world));
                     }
                     col = col.div(ns);
+                    col = new Vec3((float) Math.sqrt(col.a()), (float) Math.sqrt(col.b()), (float) Math.sqrt(col.c()));
 
                     int ir = (int) (255.99 * col.a());
                     int ig = (int) (255.99 * col.b());

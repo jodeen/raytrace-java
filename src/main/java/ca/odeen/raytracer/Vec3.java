@@ -11,16 +11,15 @@ public class Vec3 {
     Vec3(float e0, float e1, float e2) {
         e = new float[]{e0, e1, e2};
     }
-    
-    
+
     public float x() {
         return e[0];
     }
-        
+
     public float y() {
         return e[1];
     }
-    
+
     public float z() {
         return e[2];
     }
@@ -40,7 +39,7 @@ public class Vec3 {
     public Vec3 add(Vec3 v1) {
         return new Vec3(this.a() + v1.a(), this.b() + v1.b(), this.c() + v1.c());
     }
-    
+
     public Vec3 sub(Vec3 v1) {
         return new Vec3(this.a() - v1.a(), this.b() - v1.b(), this.c() - v1.c());
     }
@@ -48,11 +47,11 @@ public class Vec3 {
     public Vec3 mult(float f) {
         return new Vec3(f * this.a(), f * this.b(), f * this.c());
     }
-    
+
     public Vec3 div(float t) {
-        return new Vec3(e[0]/t, e[1]/t, e[2]/t);
+        return new Vec3(e[0] / t, e[1] / t, e[2] / t);
     }
-    
+
     public float length() {
         return (float) Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
     }
@@ -60,8 +59,12 @@ public class Vec3 {
     public Vec3 unitVector() {
         return this.div(this.length());
     }
-    
+
     public float dot(Vec3 v1) {
         return a() * v1.a() + b() * v1.b() + c() * v1.c();
+    }
+
+    public float squaredLength() {
+        return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
     }
 }
