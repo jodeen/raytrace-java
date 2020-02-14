@@ -2,6 +2,7 @@ package ca.odeen.raytracer;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.util.Random;
 
 /**
  *
@@ -21,32 +22,30 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
+        Random rand = new Random();
         int nx = 200;
         int ny = 100;
+        int ns = 100;
+
         try (BufferedWriter os = new BufferedWriter(new FileWriter("img.ppm"))) {
             os.write("P3\n" + nx + " " + ny + "\n255\n");
 
-            Vec3 lowerLeftCorner = new Vec3(-2f, -1f, -1f);
-            Vec3 horizontal = new Vec3(4f, 0f, 0f);
-            Vec3 vertical = new Vec3(0f, 2f, 0f);
-            Vec3 origin = new Vec3(0f, 0f, 0f);
             Hittable world = new HittableList(
                     new Sphere(new Vec3(0f, 0f, -1f), 0.5f),
                     new Sphere(new Vec3(0f, -100.5f, -1f), 100f));
-//            world = new Sphere(new Vec3(0f, 0f, -1f), 0.5f);
+            Camera cam = new Camera();
 
             for (int j = ny - 1; j >= 0; j--) {
                 for (int i = 0; i < nx; i++) {
+                    Vec3 col = new Vec3(0f, 0f, 0f);
+                    for (int s = 0; s < ns; s++) {
 
-                    float u = (float) i / (float) nx;
-                    float v = (float) j / (float) ny;
-
-                    Ray r = new Ray(origin,
-                            lowerLeftCorner.add(horizontal.mult(u)).add(vertical.mult(v)));
-
-                    Vec3 p = r.pointAtParameter(2f);
-
-                    Vec3 col = color(r, world);
+                        float u = (float) (i + rand.nextFloat()) / (float) nx;
+                        float v = (float) (j + rand.nextFloat()) / (float) ny;
+                        Ray r = cam.getRay(u, v);
+                        col = col.add(color(r, world));
+                    }
+                    col = col.div(ns);
 
                     int ir = (int) (255.99 * col.a());
                     int ig = (int) (255.99 * col.b());
